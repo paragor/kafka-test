@@ -1,0 +1,13 @@
+contexts:
+  default:
+    brokers:
+      - kafka-0:9091
+  sasl:
+    brokers:
+      - kafka-0:9092
+    sasl:
+      enabled: true
+      username: admin
+      password: admin
+#current-context: default
+current-context: sasl

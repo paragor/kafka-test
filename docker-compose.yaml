@@ -1,0 +1,45 @@
+version: '2'
+services:
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 32181:2181
+  
+  kafka-0:
+#    image: bitnami/kafka:3.4.0
+#    image: bitnami/kafka:2.8.0
+    image: bitnami/kafka:2.4.1
+    environment:
+      - EXTRA_ARGS=-Djava.security.auth.login.config=/etc/kafka/jaas.conf
+    command:
+      - bash 
+      - -c
+      - |
+        cp /tmp/libs/* /opt/bitnami/kafka/libs/
+        mkdir -p /tmp/kafka && /opt/bitnami/kafka/bin/kafka-server-start.sh /etc/kafka/server.properties
+    volumes:
+      - ./config/kafka-0:/etc/kafka
+      - ./jars:/tmp/libs
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+    
+  kafkactl:
+    image: deviceinsight/kafkactl:latest
+    entrypoint: /bin/bash -c 
+    command:
+      - sleep 100000
+    volumes:
+      - ./config/kafkactl:/etc/kafkactl
+      - ./config/kafkactl:/root/kafkactl
